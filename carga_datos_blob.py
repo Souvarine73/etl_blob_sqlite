@@ -5,14 +5,6 @@ from datetime import datetime
 import json
 
 # Conexion a Azurite y campos para crear el blob
-'''
-CONNECTION_STRING = (
-    "DefaultEndpointsProtocol=http;"
-    "AccountName=devstoreaccount1;"
-    "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
-    "BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
-)
-'''
 config_file = 'local.settings.json'
 container_name = "clientes"
 blob_name = f"clientes_{str(datetime.now().strftime('%Y%m%d_%H%M%S'))}.csv"
