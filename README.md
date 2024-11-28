@@ -1,50 +1,51 @@
 # Azure Function ETL: Gestión de Clientes
 
-Este proyecto implementa un proceso ETL (Extract, Transform, Load) utilizando **Azure Functions** para gestionar datos de clientes. El flujo de trabajo incluye la generación de datos sintéticos, almacenamiento en blobs de Azure Storage, consolidación de los datos en un archivo maestro y su ingestión en una base de datos SQLite.
+Este proyecto implementa un flujo ETL (Extract, Transform, Load) utilizando **Azure Functions** para gestionar datos de clientes. El flujo incluye la generación de datos sintéticos, almacenamiento en Azure Blob Storage, consolidación de información y su ingestión en una base de datos SQLite.
 
-## Características principales
+## 🚀 Características principales
 
-- **Generación de datos sintéticos:** Crea un conjunto de datos aleatorio con información de clientes (ID, teléfono, código de país, edad y fecha de creación).
-- **Almacenamiento en Azure Blob Storage:** Los datos se cargan como archivos CSV en un contenedor de Azure Blob Storage.
-- **Consolidación de datos:** Descarga y combina todos los blobs del contenedor, eliminando duplicados según la última fecha de creación.
-- **Ingestión en SQLite:** Los datos consolidados se almacenan en una base de datos SQLite, actualizando los registros existentes en caso de conflicto.
+- **Generación de datos sintéticos**: Creación de registros ficticios con ID, teléfono, país, edad y fecha.
+- **Almacenamiento en Azure Blob Storage**: Almacena los datos generados como archivos CSV en un contenedor.
+- **Consolidación de datos**: Descarga y combina los datos de múltiples blobs, eliminando duplicados basados en la fecha de creación más reciente.
+- **Ingestión en SQLite**: Inserta o actualiza los datos procesados en una base de datos SQLite local.
 
 ---
 
-## Estructura del Proyecto
+## 📂 Estructura del Proyecto
 
-### 1. **Archivo `bbdd_sqlite.py`**
+### `bbdd_sqlite.py`
 Gestiona la base de datos SQLite:
-- Crea la tabla `clientes` si no existe, con las siguientes columnas:
-  - `cliente_id`: Identificador único del cliente.
+- Crea la tabla `clientes` con las siguientes columnas:
+  - `cliente_id`: Identificador único.
   - `telefono`: Número de teléfono.
   - `codigo_pais`: Código del país.
   - `edad`: Edad del cliente.
-  - `fecha_creacion`: Marca de tiempo de la creación del registro.
+  - `fecha_creacion`: Marca de tiempo del registro.
 
-### 2. **Archivo `carga_datos_blob.py`**
-Funciones para la generación y carga de datos en Azure Blob Storage:
-- **`creacion_dataframe(batch_size)`**: Genera un DataFrame con datos sintéticos.
-- **`cargar_config(path)`**: Lee la configuración desde un archivo `local.settings.json`.
-- **`carga_blob(df, CONN, container_name, blob_name)`**: Carga un DataFrame como archivo CSV en Azure Blob Storage.
+### `carga_datos_blob.py`
+Funciones para trabajar con datos y blobs:
+- **`creacion_dataframe(batch_size=20)`**: Genera un DataFrame con datos sintéticos.
+- **`cargar_config(path)`**: Carga la cadena de conexión desde `local.settings.json`.
+- **`carga_blob(df, CONN, container_name, blob_name)`**: Sube un DataFrame como CSV a Azure Blob Storage.
 
-### 3. **Archivo `function_app.py`**
-Define la Azure Function que orquesta el flujo ETL:
-- **Extracción:** Genera datos sintéticos y los almacena como blobs.
-- **Transformación:** Descarga y combina todos los blobs en un único DataFrame, asegurando que solo se mantenga el registro más reciente por cliente.
-- **Carga:** Inserta o actualiza los registros en la base de datos SQLite usando un comando `UPSERT`.
+### `function_app.py`
+Orquesta el flujo ETL:
+- Genera datos y los sube como blobs.
+- Descarga y consolida blobs en un único DataFrame.
+- Inserta o actualiza los datos consolidados en SQLite.
 
 ---
 
-## Requisitos
+## 🛠️ Requisitos
 
-- **Python** >= 3.8
-- **Dependencias:** Ver archivo `requirements.txt`
+- **Python**: >= 3.8
+- **Dependencias**: Ver archivo `requirements.txt`.
 
-### Configuración del entorno
+---
 
-1. **Archivo `local.settings.json`:**
-   Este archivo contiene la configuración necesaria para la conexión a Azure Blob Storage. Ejemplo:
+## ⚙️ Configuración del entorno
+
+1. Crea un archivo `local.settings.json` con tu cadena de conexión de Azure Blob Storage:
 
    ```json
    {
@@ -55,3 +56,32 @@ Define la Azure Function que orquesta el flujo ETL:
            "connection_string": "DefaultEndpointsProtocol=https;AccountName=<ACCOUNT_NAME>;AccountKey=<ACCOUNT_KEY>;EndpointSuffix=core.windows.net"
        }
    }
+
+2. Instalar dependencias:
+   ```bash
+   pip install -r requirements.txt
+
+## 🚀 Cómo usar
+
+1. Prepara el entorno virtual:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Linux/Mac
+   .\venv\Scripts\activate   # Windows
+
+2. Inicializa la base de datos SQLite:
+   ```bash
+   python bbdd_sqlite.py
+
+3. Ejecuta la Azure Function:
+   ```bash
+   func start
+
+4. Resultados:
+   - Los datos consolidados se guardarán en clientes_ddbb.db.
+   - Los logs detallarán el progreso de la ejecución.
+
+## 📝 Notas
+   - Azure Blob Storage: El contenedor clientes se creará automáticamente si no existe.
+   - Ejecución periódica: El disparador cron ejecuta la función cada 20 segundos (schedule="*/20 * * * * *"), feel free to play around con el tiempo.
+   - Manejo de conflictos: Los registros existentes en SQLite se actualizan si cambian los datos.
