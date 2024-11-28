@@ -7,16 +7,20 @@ def creacion_tabla() -> None:
 
         # creamos un cursor
         cursor = conn.cursor()
-
+        
         # Crear la tabla "clientes" si no existe
-        cursor.execute('''
+
+        sql = '''
             CREATE TABLE IF NOT EXISTS clientes (
                 cliente_id TEXT PRIMARY KEY,
                 telefono INTEGER NOT NULL,
                 codigo_pais TEXT NOT NULL,
-                edad INTEGER NOT NULL
+                edad INTEGER NOT NULL,
+                fecha_creacion TEXT NOT NULL
             )
-        ''')
+        '''
+    
+        cursor.execute(sql)
 
         # Confirmar los cambios
         conn.commit()
