@@ -49,7 +49,7 @@ def carga_blob(df: pd.DataFrame, CONN: str, container_name: str, blob_name: str)
     except Exception as e:
         print(f"Error al subir el archivo CSV: {e}")
 
-# Ejecucio
+# Ejecucion
 df = creacion_dataframe()
 carga_blob(df, CONNECTION_STRING, container_name, blob_name)
 
